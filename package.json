@@ -1,15 +1,15 @@
 {
   "name": "gh-pkg",
-  "version": "0.5.0",
-  "description": "",
+  "version": "0.6.0",
+  "description": "A helper CLI for login into GitHub's various supported package repositories.",
   "main": "dist/index.js",
   "bin": {
     "gh-pkg": "cli.js"
   },
   "scripts": {
     "build": "ncc build index.js -o dist -m -s -e keytar -e open",
-    "watch": "ncc build index.js -o dist --watch -e keytar -e open",
-    "start": "ncc run index.js -e keytar -e open",
+    "watch": "ncc build index.js -o dist --watch -s -e keytar -e open",
+    "start": "node cli.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Richard Simpson",

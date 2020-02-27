@@ -41,6 +41,7 @@ const providers = new Map([
 async function main() {
     const args = require('minimist')(process.argv.slice(2));
     const forceRefresh = !!args.forceRefresh;
+    args.provider = args._[0] || args.provider;
     let org = args.org;
     console.log('Getting token...');
     const token = await getToken(forceRefresh);
