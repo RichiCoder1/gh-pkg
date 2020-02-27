@@ -36,13 +36,69 @@ const providers = new Map([
             requiresUsername: true,
         },
     ],
+    [
+        'nuget',
+        {
+            setter: async (token, args) => {
+                const which = require('which');
+                const nugetExe = which.sync('nuget', { nothrow: true });
+                if (!nugetExe) {
+                    console.log(
+                        'Unable to locate nuget. To add this provider, add the following to the appropriate nuget.config:\n'
+                    );
+                    console.log(
+                        `<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <packageSources>
+        <!-- Other Sources... -->
+        <!-- <clear /> -->
+        <add key="${args.org}Github" value="https://nuget.pkg.github.com/${args.org}/index.json" />
+    </packageSources>
+    <packageSourceCredentials>
+        <${args.org}Github>
+            <add key="Username" value="${args.user}" />
+            <add key="ClearTextPassword" value="${token}" />
+        </${args.org}Github>
+    </packageSourceCredentials>
+</configuration>`.trim()
+                    );
+                } else {
+                    const nuget = execa(
+                        nugetExe,
+                        [
+                            'sources',
+                            'add',
+                            '-name',
+                            `${args.org}Github`,
+                            '-source',
+                            `https://nuget.pkg.github.com/${args.org}/index.json`,
+                            '-username',
+                            args.user,
+                            '-password',
+                            token,
+                            '-StorePasswordInClearText',
+                            '-NonInteractive'
+                        ],
+                        {
+                            timeout: 15000,
+                            cleanup: true,
+                        }
+                    );
+                    nuget.stdout.pipe(process.stdout);
+                    nuget.stderr.pipe(process.stderr);
+                    await nuget;
+                }
+            },
+            requiresUsername: true,
+            requiresOrg: true,
+        },
+    ],
 ]);
 
 async function main() {
     const args = require('minimist')(process.argv.slice(2));
     const forceRefresh = !!args.forceRefresh;
     args.provider = args._[0] || args.provider;
-    let org = args.org;
     console.log('Getting token...');
     const token = await getToken(forceRefresh);
 
@@ -79,37 +135,38 @@ async function main() {
         args.user = responses.user;
     }
 
-    // if (!org) {
-    //     const inquirer = require('inquirer');
-    //     const got = require('got');
+    if (!args.org && resolvedProvider.requiresOrg) {
+        const inquirer = require('inquirer');
+        const got = require('got');
 
-    //     const orgResponse = await got(`https://api.github.com/user/orgs`, {
-    //         headers: {
-    //             Authorization: `Bearer ${token}`
-    //         },
-    //         responseType: 'json',
-    //     });
-    //     const responses = await inquirer.prompt([
-    //         {
-    //             type: 'list',
-    //             name: 'org',
-    //             message: 'What organization are you getting packages from?',
-    //             choices: orgResponse.body.map(org => org.login)
-    //         },
-    //     ]);
-    //     if (!responses.org) {
-    //         throw Error('You must select an organization!');
-    //     }
-    //     org = responses.org;
-    // }
+        const orgResponse = await got(`https://api.github.com/user/orgs`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            responseType: 'json',
+        });
+        const responses = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'org',
+                message: 'What organization are you getting packages from?',
+                choices: orgResponse.body.map(org => org.login),
+            },
+        ]);
+        if (!responses.org) {
+            throw Error('You must select an organization!');
+        }
+        args.org = responses.org;
+    }
 
     const spinner = ora(`Setting up authentication for ${args.provider}...\n`).start();
     try {
-        await resolvedProvider.setter(token, { ...args, org, meta: resolvedProvider });
+        await resolvedProvider.setter(token, { ...args, meta: resolvedProvider });
         spinner.succeed('Done!');
         process.exit(0);
     } catch (e) {
-        spinner.fail(e);
+        spinner.fail(e.toString());
+        console.error(e);
         process.exit(-1);
     }
 }
