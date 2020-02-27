@@ -1,8 +1,11 @@
 {
   "name": "gh-pkg",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "dist/index.js",
+  "bin": {
+    "gh-pkg": "cli.js"
+  },
   "scripts": {
     "build": "ncc build index.js -o dist -m -s -e keytar",
     "watch": "ncc build index.js -o dist --watch -e keytar",
