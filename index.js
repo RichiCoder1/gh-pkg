@@ -62,6 +62,7 @@ const providers = new Map([
     </packageSourceCredentials>
 </configuration>`.trim()
                     );
+                    console.log();
                 } else {
                     const nuget = execa(
                         nugetExe,
