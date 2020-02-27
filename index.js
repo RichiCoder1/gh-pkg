@@ -9,10 +9,15 @@ const providers = new Map([
         'npm',
         {
             setter: async (token, args) => {
-                const npm = execa('npm', ['set', `//npm.pkg.github.com/:_authToken=${token}`, args.local ? '' : '-g']);
-                npm.stdout.pipe(process.stdout);
-                npm.stderr.pipe(process.stderr);
-                await npm;
+                const { stdout, stderr } = await execa('npm', ['set', `//npm.pkg.github.com/:_authToken=${token}`, args.local ? '' : '-g']);
+                if (!!(stdout.trim())) {
+                    console.log(stdout);
+                    console.log();
+                }
+                if (!!(stderr.trim())) {
+                    console.error(stderr);
+                    console.error();
+                }
                 console.log('Registry config set.');
             },
         },
@@ -21,7 +26,7 @@ const providers = new Map([
         'docker',
         {
             setter: async (token, args) => {
-                const docker = execa(
+                const { stdout, stderr } = await execa(
                     'docker',
                     ['login', '--username', args.user, '--password', token, 'docker.pkg.github.com'],
                     {
@@ -29,9 +34,18 @@ const providers = new Map([
                         cleanup: true,
                     }
                 );
-                docker.stdout.pipe(process.stdout);
-                docker.stderr.pipe(process.stderr);
-                await docker;
+                if (!!(stdout.trim())) {
+                    console.log(stdout);
+                    console.log();
+                }
+                if (!!(stderr.trim())) {
+                    // Hide password warning, it's irrelevant for non-interactive
+                    const output = stderr.split('\n').filter(line => !/stdin/.test(line));
+                    if (output.length > 0) {
+                        console.error(output.join('\n'));
+                        console.error();
+                    }
+                }
             },
             requiresUsername: true,
         },
@@ -64,7 +78,8 @@ const providers = new Map([
                     );
                     console.log();
                 } else {
-                    const nuget = execa(
+                    // TODO: We should allow local configs
+                    const { stderr, stdout } = await execa(
                         nugetExe,
                         [
                             'sources',
@@ -85,9 +100,15 @@ const providers = new Map([
                             cleanup: true,
                         }
                     );
-                    nuget.stdout.pipe(process.stdout);
-                    nuget.stderr.pipe(process.stderr);
-                    await nuget;
+                    if (!!(stdout.trim())) {
+                        console.log(stdout);
+                        console.log();
+                    }
+                    if (!!(stderr.trim())) {
+                        console.error(stderr);
+                        console.error();
+                    }
+                    console.log('Package source added.');
                 }
             },
             requiresUsername: true,

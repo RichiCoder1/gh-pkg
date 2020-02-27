@@ -1,6 +1,6 @@
 {
   "name": "gh-pkg",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "A helper CLI for login into GitHub's various supported package repositories.",
   "main": "dist/index.js",
   "bin": {
