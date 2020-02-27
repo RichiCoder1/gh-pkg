@@ -42,6 +42,7 @@ async function main() {
     const args = require('minimist')(process.argv.slice(2));
     const forceRefresh = !!args.forceRefresh;
     let org = args.org;
+    console.log('Getting token...');
     const token = await getToken(forceRefresh);
 
     if (!args.provider || !providers.has(args.provider)) {
