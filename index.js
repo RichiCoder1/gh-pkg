@@ -97,6 +97,9 @@ const providers = new Map([
 
 async function main() {
     const args = require('minimist')(process.argv.slice(2));
+    if (args._.length > 0 && args._[0] === 'login') {
+        args._.splice(0, 1);
+    }
     const forceRefresh = !!args.forceRefresh;
     args.provider = args._[0] || args.provider;
     console.log('Getting token...');

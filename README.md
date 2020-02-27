@@ -11,7 +11,7 @@ npm install RichiCoder1/gh-pkg#master -g
 Usage:
 
 ```sh
-gh-pkg <docker|npm|nuget> [--forceRefresh]
+gh-pkg login <docker|npm|nuget> [--forceRefresh]
 ```
 
 And follow the instructions.
