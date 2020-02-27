@@ -1,15 +1,15 @@
 {
   "name": "gh-pkg",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "",
   "main": "dist/index.js",
   "bin": {
     "gh-pkg": "cli.js"
   },
   "scripts": {
-    "build": "ncc build index.js -o dist -m -s -e keytar",
-    "watch": "ncc build index.js -o dist --watch -e keytar",
-    "start": "ncc run index.js -e keytar",
+    "build": "ncc build index.js -o dist -m -s -e keytar -e open",
+    "watch": "ncc build index.js -o dist --watch -e keytar -e open",
+    "start": "ncc run index.js -e keytar -e open",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Richard Simpson",
@@ -21,11 +21,13 @@
     "got": "^10.6.0",
     "inquirer": "^7.0.4",
     "minimist": "^1.2.0",
-    "open": "^7.0.2",
-    "openid-client": "^3.13.0",
     "ora": "^4.0.3"
   },
   "dependencies": {
-    "keytar": "^5.4.0"
+    "keytar": "^5.4.0",
+    "open": "^7.0.2"
+  },
+  "repository": {
+    "url": "https://github.com/RichiCoder1/gh-pkg/",
   }
 }
