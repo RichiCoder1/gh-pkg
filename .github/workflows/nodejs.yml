@@ -27,4 +27,4 @@ jobs:
       with:
         commit_message: Publish dist
         commit_options: '--no-verify --signoff'
-        file_pattern: dist/\*.js
+        file_pattern: dist/*.js
