@@ -189,7 +189,7 @@ async function getToken(forceRefresh = false) {
     authorizeUrl.search = new URLSearchParams({
         client_id: account.account,
         redirect_url: `http://localhost:51321/auth-code/callback`,
-        scope: 'repo write:packages read:org',
+        scope: 'read:packages read:org',
         state: 'lol',
     });
     await open(authorizeUrl.toJSON());
