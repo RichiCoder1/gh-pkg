@@ -106,8 +106,10 @@ async function main() {
     try {
         await resolvedProvider.setter(token, { ...args, org, meta: resolvedProvider });
         spinner.succeed('Done!');
+        process.exit(0);
     } catch (e) {
         spinner.fail(e);
+        process.exit(-1);
     }
 }
 
